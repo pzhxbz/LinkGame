@@ -25,6 +25,7 @@ namespace WindowsGame1
         private int mode;
         Menu menu;
         private Skin skin;
+        private Table table;
 
         public Game1()
         {
@@ -35,6 +36,7 @@ namespace WindowsGame1
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
             menu = new Menu(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            table = new Table(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
         }
 
         /// <summary>
@@ -69,6 +71,11 @@ namespace WindowsGame1
             menu.ChooseTexture = skin.MenuChoose;
             menu.Font = skin.Font;
             menu.InitDrawTask();
+
+            table.BlockTexture = skin.Picture;
+            table.LineTexture2D = skin.LineTexture2D;
+            table.Background = skin.GameBack;
+            table.Init();
 
             mouseTexture = skin.MousePointer;
 
@@ -119,9 +126,9 @@ namespace WindowsGame1
             {
                 menu.Draw(spriteBatch);
             }
-            else
+            else if (menu.GetStates() == Menu.GAMESTART)
             {
-                menu.InitState();
+                table.Draw(spriteBatch);
 
             }
 
