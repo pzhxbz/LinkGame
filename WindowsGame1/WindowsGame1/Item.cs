@@ -79,7 +79,7 @@ namespace WindowsGame1
 
             if (isFocus)
             {
-                batch.Draw(Texture, area, Color.Black);
+                batch.Draw(Texture, area, Color.GreenYellow);
 
             }
             else
