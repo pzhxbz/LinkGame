@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -118,4 +121,97 @@ namespace WindowsGame1
         }
     }
 
+    class Timer : Item
+    {
+        public SpriteFont Font;
+        public HiPerfTimer timer;
+        private bool IsTimer;
+        private long second;
+        public Timer(int second)
+        {
+            timer = new HiPerfTimer();
+            timer.Stop();
+            IsTimer = true;
+            this.second = second;
+        }
+        public override void Draw(SpriteBatch batch, bool isFocus = false)
+        {
+
+            if (!IsTimer)
+            {
+                timer.Stop();
+            }
+            else
+            {
+                timer.Start();
+            }
+
+            batch.DrawString(Font, Convert.ToString(second + timer.Duration()), new Vector2(Position.X, Position.Y), Color.Black);
+        }
+
+        public void Pause()
+        {
+            timer.Stop();
+        }
+
+        public void Continue()
+        {
+            timer.Start();
+        }
+
+        public long GetLatsTime()
+        {
+            return second + timer.Duration();
+        }
+    }
+    class HiPerfTimer
+    {
+        [DllImport("Kernel32.dll")]
+        private static extern bool QueryPerformanceCounter(
+            out long lpPerformanceCount);
+
+        [DllImport("Kernel32.dll")]
+        private static extern bool QueryPerformanceFrequency(
+            out long lpFrequency);
+
+        private long startTime, stopTime;
+        private long freq;
+
+        // 构造函数
+        public HiPerfTimer()
+        {
+            startTime = 0;
+            stopTime = 0;
+
+            if (QueryPerformanceFrequency(out freq) == false)
+            {
+                // 不支持高性能计数器
+                throw new Win32Exception();
+            }
+        }
+        // 开始计时器
+        public void Start()
+        {
+            // 来让等待线程工作
+            Thread.Sleep(0);
+
+            QueryPerformanceCounter(out startTime);
+        }
+
+        // 停止计时器
+        public void Stop()
+        {
+            QueryPerformanceCounter(out stopTime);
+        }
+
+        // 返回计时器经过时间(单位：秒)
+        public long Duration()
+        {
+
+            return (stopTime - startTime) / freq;
+        }
+
+
+
+    }
 }

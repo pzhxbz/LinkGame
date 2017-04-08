@@ -75,6 +75,7 @@ namespace WindowsGame1
             table.BlockTexture = skin.Picture;
             table.LineTexture2D = skin.LineTexture2D;
             table.Background = skin.GameBack;
+            table.font = skin.Font;
             table.Init();
 
             mouseTexture = skin.MousePointer;

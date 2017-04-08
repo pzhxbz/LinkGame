@@ -14,7 +14,7 @@ namespace WindowsGame1
     class Table
     {
         private Point _size;
-        private int _num = 64;
+        private int _num = 36;
         private bool[] _isChoose;
         private Block[] _blocks;
         private int[][] _blocksData;
@@ -22,9 +22,11 @@ namespace WindowsGame1
         private Point _blockSize;
         private int _nowChoose = -1;
         private ArrayList[] m_same;
+        private Timer timer;
         public Texture2D[] BlockTexture;
         public Texture2D LineTexture2D;
         public Texture2D Background;
+        public SpriteFont font;
         public Table(int width, int height)
         {
             _size = new Point(width, height);
@@ -63,6 +65,9 @@ namespace WindowsGame1
 
                 }
             }
+            timer = new Timer(60);
+            timer.Font = font;
+            timer.Position = new Point(_size.X * 4 / 5, _size.Y * 4 / 5);
         }
 
         public void Draw(SpriteBatch batch)
@@ -70,9 +75,21 @@ namespace WindowsGame1
             batch.Draw(Background,
                 new Rectangle(0, 0, _size.X, _size.Y),   //draw background
                 Color.White);
+            var getLine = CanLine();
+            if (_num == 0 || getLine.Count == 0)
+            {
+                batch.DrawString(font, "congratulation!", new Vector2(_size.X / 2, _size.Y / 2), Color.Red);
+                return;
+            }
+            if (timer.GetLatsTime() <= 0)
+            {
+                batch.DrawString(font, "time over!", new Vector2(_size.X / 2, _size.Y / 2), Color.Red);
+                return;
+            }
+            timer.Draw(batch);
             MouseState mouseState = Mouse.GetState();
             var mousePosition = new Point(mouseState.X, mouseState.Y);
-            var getLine = CanLine();
+
             if (mouseState.RightButton == ButtonState.Pressed)
             {
                 _nowChoose = -1;
@@ -110,6 +127,7 @@ namespace WindowsGame1
                                             _isChoose[_nowChoose] = true;
                                             _isChoose[i * 8 + j] = true;
                                             _nowChoose = -1;
+                                            _num -= 2;
                                             break;
                                         }
                                     }
