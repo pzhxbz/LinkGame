@@ -131,6 +131,7 @@ namespace WindowsGame1
                                             break;
                                         }
                                     }
+                                    _nowChoose = -1;
 
                                 }
                             }
