@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 namespace WindowsGame1
 {
@@ -17,6 +19,7 @@ namespace WindowsGame1
         public SpriteFont Font;
         public Texture2D LineTexture2D;
         public Texture2D GameBack;
+        public Song Sound;
         public Skin()
         {
 
@@ -35,6 +38,7 @@ namespace WindowsGame1
             }
             LineTexture2D = Content.Load<Texture2D>("line");
             GameBack = Content.Load<Texture2D>("GameBackground");
+            Sound = Content.Load<Song>("music");
         }
     }
 }

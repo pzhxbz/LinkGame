@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,6 +24,10 @@ namespace WindowsGame1
         private int _nowChoose = -1;
         private ArrayList[] m_same;
         private Timer timer;
+        private bool _searchFlag = false;
+        private ArrayList getLine;
+        private ArrayList lineInfo;
+        private ArrayList drawLineTask;
         public Texture2D[] BlockTexture;
         public Texture2D LineTexture2D;
         public Texture2D Background;
@@ -40,6 +45,7 @@ namespace WindowsGame1
                 _blocksData[i] = new int[8];
             }
             m_same = new ArrayList[10];//假定只有10种
+            drawLineTask = new ArrayList();
         }
 
         public void Init()
@@ -75,10 +81,15 @@ namespace WindowsGame1
             batch.Draw(Background,
                 new Rectangle(0, 0, _size.X, _size.Y),   //draw background
                 Color.White);
-            var getLine = CanLine();
+            if (_searchFlag == false)
+            {
+                getLine = CanLine();
+                _searchFlag = true;
+            }
+
             if (_num == 0 || getLine.Count == 0)
             {
-                batch.DrawString(font, "congratulation!", new Vector2(_size.X / 2, _size.Y / 2), Color.Red);
+                batch.DrawString(font, "congratulation!There is no blocks can line", new Vector2(_size.X / 2, _size.Y / 2), Color.Red);
                 return;
             }
             if (timer.GetLatsTime() <= 0)
@@ -116,18 +127,26 @@ namespace WindowsGame1
                                     if (a == b)
                                     {
                                         _nowChoose = -1;
-                                        break;
+                                        //break;
                                     }
                                     foreach (var line in getLine)
                                     {
                                         if ((a == ((Point[])line)[0] && b == ((Point[])line)[1]) || (a == ((Point[])line)[1] && b == ((Point[])line)[0]))
                                         {
+                                            var lines = (Point[])lineInfo[getLine.IndexOf(line)];
+                                            var tempData = new DrawLineData(batch, lines);
+                                            //Thread thread = new Thread(() => DrawBlocksLines(tempData));
+                                            //thread.Start();
+
+                                            //DrawBlocksLines(tempData);
+                                            drawLineTask.Add(tempData);
                                             _blocksData[a.X][a.Y] = 0;
                                             _blocksData[b.X][b.Y] = 0;
                                             _isChoose[_nowChoose] = true;
                                             _isChoose[i * 8 + j] = true;
                                             _nowChoose = -1;
                                             _num -= 2;
+                                            _searchFlag = false;
                                             break;
                                         }
                                     }
@@ -148,12 +167,23 @@ namespace WindowsGame1
                     }
                 }
             }
-
+            for (int i = 0; i < drawLineTask.Count; i++)
+            {
+                var temp = (DrawLineData)drawLineTask[i];
+                DrawBlocksLines(temp);
+                temp.Times--;
+                if (temp.Times <= 0)
+                {
+                    drawLineTask.RemoveAt(i);
+                }
+            }
 
         }
 
         private ArrayList CanLine()
         {
+            lineInfo = null;
+            lineInfo = new ArrayList();
             for (int i = 0; i < 10; i++)
             {
                 m_same[i] = null;
@@ -184,8 +214,12 @@ namespace WindowsGame1
                             {
                                 continue;
                             }
-                            if (Available(ref pt))
+                            Point[] temp;
+                            if (Available(ref pt, out temp))
+                            {
                                 m_results.Add(new Point[2] { pt[0], pt[1] });
+                                lineInfo.Add(temp);
+                            }
                             //return pt;
                         }
                     }
@@ -281,7 +315,7 @@ namespace WindowsGame1
             }
         }
 
-        private bool Available(ref Point[] pt)
+        private bool Available(ref Point[] pt, out Point[] line)
         {
             ArrayList[] rowEx, colEx;//建立横纵扩展位            
             rowEx = new ArrayList[2];
@@ -312,7 +346,15 @@ namespace WindowsGame1
                                 break;
                             }
                         }
-                        if (y1 == 0 || y1 == 7 || flag) return true;
+                        if (y1 == 0 || y1 == 7 || flag)
+                        {
+                            line = new Point[4];
+                            line[0] = pt[0];
+                            line[1] = new Point(x1, y1);
+                            line[2] = new Point(x2, y2);
+                            line[3] = pt[1];
+                            return true;
+                        }
                     }
                 }
             }
@@ -337,12 +379,66 @@ namespace WindowsGame1
                                 break;
                             }
                         }
-                        if (x1 == 0 || x1 == 7 || flag) return true;
+                        if (x1 == 0 || x1 == 7 || flag)
+                        {
+                            line = new Point[4];
+                            line[0] = pt[0];
+                            line[1] = new Point(x1, y1);
+                            line[2] = new Point(x2, y2);
+                            line[3] = pt[1];
+                            return true;
+                        }
                     }
                 }
             }
+            line = null;
             return false;
+        }
+        private void DrawBlocksLines(DrawLineData data)
+        {
+            SpriteBatch batch = data.Batch;
+            Point[] line = data.LineInfo;
+            Point[] position = new Point[4];
+            for (int i = 0; i < 4; i++)
+            {
+                var temp = _blocks[line[i].X * 8 + line[i].Y];
+                position[i] = new Point(temp.Position.X + temp.Size.X / 2, temp.Position.Y + temp.Size.Y / 2);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                var temp1 = position[i];
+                var temp2 = position[i + 1];
+                if (temp1 == temp2)
+                {
+                    continue;
+                }
+                if (temp1.X > temp2.X || temp1.Y > temp2.Y)
+                {
+                    var area = new Rectangle(temp2.X, temp2.Y, temp1.X - temp2.X + 10, temp1.Y - temp2.Y + 10);
+                    batch.Draw(_blocks[i].LineTexture, area, Color.White);
+                }
+                else
+                {
+                    var area = new Rectangle(temp1.X, temp1.Y, temp2.X - temp1.X + 10, temp2.Y - temp1.Y + 10);
+                    batch.Draw(_blocks[i].LineTexture, area, Color.White);
+                }
+            }
+            //Thread.Sleep(1000);
         }
 
     }
+
+    class DrawLineData
+    {
+        public SpriteBatch Batch;
+        public Point[] LineInfo;
+        public int Times;
+        public DrawLineData(SpriteBatch batch, Point[] lineInfo)
+        {
+            this.Batch = batch;
+            this.LineInfo = lineInfo;
+            this.Times = 30;
+        }
+    }
+
 }

@@ -26,6 +26,7 @@ namespace WindowsGame1
         Menu menu;
         private Skin skin;
         private Table table;
+        private Song music;
 
         public Game1()
         {
@@ -35,8 +36,10 @@ namespace WindowsGame1
             mode = MENU;
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
+
             menu = new Menu(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
             table = new Table(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+
         }
 
         /// <summary>
@@ -78,8 +81,13 @@ namespace WindowsGame1
             table.font = skin.Font;
             table.Init();
 
+            music = skin.Sound;
             mouseTexture = skin.MousePointer;
 
+            MediaPlayer.IsRepeating = true;
+            if (MediaPlayer.GameHasControl &&
+    MediaPlayer.State != MediaState.Playing)
+                MediaPlayer.Play(music);
             // TODO: use this.Content to load your game content here
         }
 
