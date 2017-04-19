@@ -136,16 +136,7 @@ namespace WindowsGame1
         }
         public override void Draw(SpriteBatch batch, bool isFocus = false)
         {
-
-            if (!IsTimer)
-            {
-                timer.Stop();
-            }
-            else
-            {
-                timer.Start();
-            }
-
+            timer.Start();
             batch.DrawString(Font, Convert.ToString(second + timer.Duration()), new Vector2(Position.X, Position.Y), Color.Black);
         }
 
@@ -162,6 +153,11 @@ namespace WindowsGame1
         public long GetLatsTime()
         {
             return second + timer.Duration();
+        }
+
+        public void ReStart(int seconds)
+        {
+            this.second -= seconds;
         }
     }
     class HiPerfTimer

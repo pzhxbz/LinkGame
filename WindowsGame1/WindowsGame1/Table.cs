@@ -126,7 +126,8 @@ namespace WindowsGame1
                                     Point b = new Point(_nowChoose / 8, _nowChoose % 8);
                                     if (a == b)
                                     {
-                                        _nowChoose = -1;
+                                        continue;
+                                        //_nowChoose = -1;
                                         //break;
                                     }
                                     foreach (var line in getLine)
