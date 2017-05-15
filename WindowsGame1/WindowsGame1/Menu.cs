@@ -122,8 +122,8 @@ namespace WindowsGame1
         {
             _tasks = new Queue<Item>();
             _tasks.Enqueue(ProduceList("Game Start", GAMESTART));
-            _tasks.Enqueue(ProduceList("Load Game", LOAD));
-            _tasks.Enqueue(ProduceList("Setting", SETTING));
+            //_tasks.Enqueue(ProduceList("Load Game", LOAD));
+            //_tasks.Enqueue(ProduceList("Setting", SETTING));
             _tasks.Enqueue(ProduceList("Exit", EXIT));
         }
 

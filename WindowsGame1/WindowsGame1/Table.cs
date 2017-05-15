@@ -32,6 +32,7 @@ namespace WindowsGame1
         public Texture2D LineTexture2D;
         public Texture2D Background;
         public SpriteFont font;
+        public bool IsInit = false;
         public Table(int width, int height)
         {
             _size = new Point(width, height);
@@ -74,6 +75,7 @@ namespace WindowsGame1
             timer = new Timer(60);
             timer.Font = font;
             timer.Position = new Point(_size.X * 4 / 5, _size.Y * 4 / 5);
+            IsInit = true;
         }
 
         public void Draw(SpriteBatch batch)

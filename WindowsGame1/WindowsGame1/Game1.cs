@@ -79,7 +79,7 @@ namespace WindowsGame1
             table.LineTexture2D = skin.LineTexture2D;
             table.Background = skin.GameBack;
             table.font = skin.Font;
-            table.Init();
+
 
             music = skin.Sound;
             mouseTexture = skin.MousePointer;
@@ -137,8 +137,11 @@ namespace WindowsGame1
             }
             else if (menu.GetStates() == Menu.GAMESTART)
             {
+                if (!table.IsInit)
+                {
+                    table.Init();
+                }
                 table.Draw(spriteBatch);
-
             }
 
 
